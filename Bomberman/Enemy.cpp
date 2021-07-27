@@ -25,6 +25,7 @@ void Enemy::Initialize()
 	Active = false;
 
 	Time = GetTickCount64();
+	Key = "Enemy";
 }
 
 void Enemy::Update()

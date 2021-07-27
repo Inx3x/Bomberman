@@ -11,11 +11,11 @@ const ULONG KEYID_RETURN	= 0x00000040;
 const int CONSOL_MAX_WIDTH	= 104;
 const int CONSOL_MAX_HEIGHT = 52;
 
-const float PLAYER_SPEED_X	= 1.5f;
+const float PLAYER_SPEED_X	= 2.0f;
 const float PLAYER_SPEED_Y	= 1.0f;
 
 const float ENEMY_SPEED_X = 2.0f;
-const float ENEMY_SPEED_Y = 0.5f;
+const float ENEMY_SPEED_Y = 1.0f;
 
 const float BOSS_SPEED_X = 2.0f;
 const float BOSS_SPEED_Y = 1.0f; 

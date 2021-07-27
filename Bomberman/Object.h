@@ -4,6 +4,7 @@
 class Object
 {
 protected:
+	string Key;
 	Transform TransInfo;
 	char* Texture[3];
 	int Color;
@@ -35,7 +36,8 @@ public:
 		else if (Explosion_Weight > 1)	Explosion_Weight--;
 	}
 	void setBossExplosion(const int& _Boss_Explosion) { Boss_Explosion = _Boss_Explosion; }
-
+	
+	string GetKey() { return Key; }
 	int getItemList() { return ItemList; }
 	bool getActive() { return Active; }
 	ULONGLONG gettTime() { return Time; }

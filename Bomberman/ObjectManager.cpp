@@ -30,11 +30,13 @@ void ObjectManager::Initialize()
 	m_pPlayer = new Player;
 	m_pPlayer->Initialize();
 	m_pPlayer->setActive(true);
+	AddObject(m_pPlayer);
 
 	//气藕 俺眉 积己
 	for (int i = 0; i < 16; i++) {
 		m_pBomb[i] = new Bomb;
 		m_pBomb[i]->Initialize();
+		AddObject(m_pBomb[i]);
 	}
 	bomb_cnt = 0;
 	bomb_capacity = 2;
@@ -44,6 +46,7 @@ void ObjectManager::Initialize()
 		m_pWall[i] = new Wall;
 		m_pWall[i]->Initialize();
 		m_pWall[i]->setActive(true);
+		AddObject(m_pWall[i]);
 	}
 	createWall();
 
@@ -51,6 +54,7 @@ void ObjectManager::Initialize()
 	for (int i = 0; i < 64; i++) {
 		m_pBox[i] = new Box;
 		m_pBox[i]->Initialize();
+		AddObject(m_pBox[i]);
 	}	
 	createBox();
 
@@ -59,6 +63,7 @@ void ObjectManager::Initialize()
 		m_pItem[i] = new Item;
 		m_pItem[i]->Initialize();
 		m_pItem[i]->setActive(true);
+		AddObject(m_pItem[i]);
 		item_hp[i] = 3;
 	}
 	item_cnt = 0;
@@ -69,6 +74,7 @@ void ObjectManager::Initialize()
 		{
 			m_pExplosion[i][j] = new Explosion;
 			m_pExplosion[i][j]->Initialize();
+			AddObject(m_pExplosion[i][j]);
 			switch (j) {
 			case DIRECTION_UP:
 				m_pExplosion[i][j]->setExplosionDirection(DIRECTION_UP);
@@ -90,6 +96,7 @@ void ObjectManager::Initialize()
 		m_pBossExplosion[i] = new Explosion;
 		m_pBossExplosion[i]->Initialize();
 		m_pBossExplosion[i]->setBossExplosion(true);
+		AddObject(m_pBossExplosion[i]);
 		if (i < 3)		m_pBossExplosion[i]->setExplosionDirection(DIRECTION_UP);
 		else if(i < 6)	m_pBossExplosion[i]->setExplosionDirection(DIRECTION_RIGHT);
 		else if(i < 9)	m_pBossExplosion[i]->setExplosionDirection(DIRECTION_LEFT);
@@ -100,12 +107,14 @@ void ObjectManager::Initialize()
 	for (int i = 0; i < 16; i++)	{
 		m_pEnemy[i] = new Enemy;
 		m_pEnemy[i]->Initialize();
+		AddObject(m_pEnemy[i]);
 	}
 	createEnemy();
 
 	//焊胶 积己
 	m_pBoss = new Boss;
 	m_pBoss->Initialize();
+	AddObject(m_pBoss);
 	if (Scene::stage_No == BOSS) 	m_pBoss->setActive(true);
 	
 	stage_cnt = 0;

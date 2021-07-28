@@ -9,7 +9,7 @@ public:
 	{
 		Object* pObj = new T;
 
-		pObj->Initialize();
+		//pObj->Initialize();
 
 		return pObj;
 	}

@@ -6,15 +6,16 @@ class ObjectManager
 {
 private:
 	ObjectManager();
+	static ObjectManager* m_pInstance;
+
 	//¸Ê »ý¼º
 	map<string, list<Object*>> ObjectList;
 
-	static ObjectManager* m_pInstance;
 
 	int stage_cnt;
 
 
-	Object* m_pPlayer;
+	//Object* m_pPlayer;
 
 	Object* m_pWall[128];
 	int wall_cnt;

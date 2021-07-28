@@ -1,4 +1,5 @@
 #include "ObjectManager.h"
+#include "ObjectFactory.h"
 #include "CollisionManager.h"
 #include "SceneManager.h"
 #include "DoubleBuffer.h"
@@ -39,10 +40,10 @@ void ObjectManager::AddObject(Object* _obj) {
 void ObjectManager::Initialize()
 {
 	//플레이어개체 생성
-	m_pPlayer = new Player;
-	m_pPlayer->Initialize();
-	m_pPlayer->setActive(true);
-	AddObject(m_pPlayer);
+	Object* pObj = ObjectFactory<Player>::CreateObject();
+	pObj->Initialize();
+	pObj->setActive(true);
+	AddObject(pObj);
 
 	//폭탄 개체 생성
 	for (int i = 0; i < 16; i++) {
@@ -137,7 +138,10 @@ void ObjectManager::Update()
 	//폭탄개수조정
 	setBombCnt();
 	//플레이어 업데이트
-	if (m_pPlayer->getActive())			m_pPlayer->Update();
+	//map<string, list<Object*>>::iterator iter = ObjectList.find("Player");
+	//list<Object*>::iterator iter2 = (*iter).second.begin();
+	//(*(*ObjectList.find("Player")).second.begin())->getActive();
+	if ((*(*ObjectList.find("Player")).second.begin())->getActive())	(*(*ObjectList.find("Player")).second.begin())->Update();
 	//아이템업데이트
 	for (int i = 0; i < 32; i++) {					
 		if (m_pItem[i]->getActive())	m_pItem[i]->Update();

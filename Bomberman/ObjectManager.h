@@ -10,14 +10,14 @@ private:
 
 	//¸Ê »ý¼º
 	map<string, list<Object*>> ObjectList;
+	Object* m_pObject;
 
 
 	int stage_cnt;
 
 
-	//Object* m_pPlayer;
 
-	Object* m_pWall[128];
+	//Object* m_pWall[128];
 	int wall_cnt;
 
 	Object* m_pBox[64];

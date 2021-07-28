@@ -37,12 +37,22 @@ void ObjectManager::AddObject(Object* _obj) {
 		iter->second.push_back(_obj);
 	}
 }
+
 void ObjectManager::Initialize()
 {
 	//플레이어개체 생성
-	Object* pObj = ObjectFactory<Player>::CreateObject();
-	pObj->setActive(true);
-	AddObject(pObj);
+	m_pObject = ObjectFactory<Player>::CreateObject();
+	AddObject(m_pObject);
+	m_pObject->setActive(true);
+
+	//벽객체 생성
+	m_pObject = ObjectFactory<Wall>::CreateObject();
+	for (int i = 0; i < 128; i++) {
+		AddObject(m_pObject);
+		//애매한 부분
+		m_pObject->setActive(true);
+	}
+	createWall();
 
 	//폭탄 개체 생성
 	for (int i = 0; i < 16; i++) {
@@ -52,15 +62,6 @@ void ObjectManager::Initialize()
 	}
 	bomb_cnt = 0;
 	bomb_capacity = 2;
-
-	//벽객체 생성
-	for (int i = 0; i < 128; i++) {
-		m_pWall[i] = new Wall;
-		m_pWall[i]->Initialize();
-		m_pWall[i]->setActive(true);
-		AddObject(m_pWall[i]);
-	}
-	createWall();
 
 	//박스객체 생성
 	for (int i = 0; i < 64; i++) {
@@ -132,14 +133,15 @@ void ObjectManager::Initialize()
 	stage_cnt = 0;
 }
 
+//map<string, list<Object*>>::iterator iter = ObjectList.find("Player");
+//list<Object*>::iterator iter2 = (*iter).second.begin();
+//(*(*ObjectList.find("Player")).second.begin())->getActive();
+
 void ObjectManager::Update()
 {
 	//폭탄개수조정
 	setBombCnt();
 	//플레이어 업데이트
-	//map<string, list<Object*>>::iterator iter = ObjectList.find("Player");
-	//list<Object*>::iterator iter2 = (*iter).second.begin();
-	//(*(*ObjectList.find("Player")).second.begin())->getActive();
 	if ((*(*ObjectList.find("Player")).second.begin())->getActive())	(*(*ObjectList.find("Player")).second.begin())->Update();
 	//아이템업데이트
 	for (int i = 0; i < 32; i++) {					
@@ -180,9 +182,16 @@ void ObjectManager::Update()
 void ObjectManager::Render()
 {
 	//벽 출력
+	for (list<Object*>::iterator iter = (*ObjectList.find("Wall")).second.begin(); 
+		iter != (*ObjectList.find("Wall")).second.end(); ++iter)
+	{
+		if ((*iter)->getActive())	(*iter)->Render();
+	}
+	/*
 	for (int i = 0; i < wall_cnt; i++) {
 		if (m_pWall[i]->getActive())	m_pWall[i]->Render();
 	}
+	*/
 	//상자 출력
 	for (int i = 0; i < box_cnt; i++) {
 		if(m_pBox[i]->getActive())		m_pBox[i]->Render();
@@ -219,10 +228,17 @@ void ObjectManager::Render()
 
 void ObjectManager::Release()
 {
+	//Player Release
 	SAFE_RELEASE((*(*ObjectList.find("Player")).second.begin()));
-	for (int i = 0; i < 128; i++) {
-		SAFE_RELEASE(m_pWall[i]);
+	(*ObjectList.find("Player")).second.clear();
+
+	//Wall Release
+	for (list<Object*>::iterator iter = (*ObjectList.find("Wall")).second.begin();
+		iter != (*ObjectList.find("Wall")).second.end(); ++iter)
+	{
+		SAFE_RELEASE((*iter));
 	}
+	(*ObjectList.find("Wall")).second.clear();
 	for (int i = 0; i < 64; i++) {
 		SAFE_RELEASE(m_pBox[i]);
 	}
@@ -249,21 +265,30 @@ void ObjectManager::Release()
 //벽 생성
 void ObjectManager::createWall()
 {
-	Transform m_pWall_TransInfo = m_pWall[0]->GetTransform();
+	//Transform m_pWall_TransInfo = m_pWall[0]->GetTransform();
+	/*
+	for (list<Object*>::iterator iter = (*ObjectList.find("Wall")).second.begin();
+		iter != (*ObjectList.find("Wall")).second.end(); ++iter)
+	{
+		if ((*iter)->getActive())	(*iter)->Render();
+	}
+	*/
+	Transform m_pWall_TransInfo = (*(*ObjectList.find("Wall")).second.begin())->GetTransform();
 	wall_cnt = 0;
 
 	//벽 위치 설정
+	list<Object*>::iterator iter = (*ObjectList.find("Wall")).second.begin();
 	for (int i = 0; i < 17; i++) {
 		for (int j = 0; j < 17; j++) {
 			if (i == 0 || i == 16) {
-				m_pWall[wall_cnt]->SetPosition(
+				(*iter++)->SetPosition(
 					m_pWall_TransInfo.Position.x,
 					m_pWall_TransInfo.Position.y);
 				wall_cnt++;
 			}
 			else if (i % 2 == 1) {
 				if (j == 0 || j == 16) {
-					m_pWall[wall_cnt]->SetPosition(
+					(*iter++)->SetPosition(
 						m_pWall_TransInfo.Position.x,
 						m_pWall_TransInfo.Position.y);
 					wall_cnt++;
@@ -271,7 +296,7 @@ void ObjectManager::createWall()
 			}
 			else {
 				if (j % 2 == 0) {
-					m_pWall[wall_cnt]->SetPosition(
+					(*iter++)->SetPosition(
 						m_pWall_TransInfo.Position.x,
 						m_pWall_TransInfo.Position.y);
 					wall_cnt++;

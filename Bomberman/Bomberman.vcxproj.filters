@@ -108,6 +108,9 @@
     <ClInclude Include="Ending.h">
       <Filter>소스 파일\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="ObjectFactory.h">
+      <Filter>소스 파일\Manage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">

@@ -23,7 +23,19 @@ ObjectManager::~ObjectManager()
 {
 	Release();
 }
+void ObjectManager::AddObject(Object* _obj) {
+	map<string, list<Object*>>::iterator iter = ObjectList.find(_obj->GetKey());
 
+	if (iter == ObjectList.end()) {
+		list<Object*> TempList;
+		TempList.push_back(_obj);
+
+		ObjectList.insert(make_pair(_obj->GetKey(), TempList));
+	}
+	else {
+		iter->second.push_back(_obj);
+	}
+}
 void ObjectManager::Initialize()
 {
 	//플레이어개체 생성

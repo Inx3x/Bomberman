@@ -1,11 +1,11 @@
 #pragma once
 #include "Headers.h"
-#include "Object.h"
 
 class Object;
 class ObjectManager
 {
 private:
+	ObjectManager();
 	//¸Ê »ý¼º
 	map<string, list<Object*>> ObjectList;
 
@@ -13,7 +13,6 @@ private:
 
 	int stage_cnt;
 
-	ObjectManager();
 
 	Object* m_pPlayer;
 
@@ -46,20 +45,8 @@ public:
 			m_pInstance = new ObjectManager;
 		return m_pInstance;
 	}
-	void AddObject(Object* _obj) {
-		map<string, list<Object*>>::iterator iter = ObjectList.find(_obj->GetKey());
 
-		if (iter == ObjectList.end()) {
-			list<Object*> TempList;
-			TempList.push_back(_obj);
-
-			ObjectList.insert(make_pair(_obj->GetKey(), TempList));
-		}
-		else {
-			iter->second.push_back(_obj);
-		}
-	}
-
+	void AddObject(Object* _obj);
 	void Initialize();
 	void Update();
 	void Render();

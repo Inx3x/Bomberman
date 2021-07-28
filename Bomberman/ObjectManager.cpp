@@ -41,7 +41,6 @@ void ObjectManager::Initialize()
 {
 	//플레이어개체 생성
 	Object* pObj = ObjectFactory<Player>::CreateObject();
-	pObj->Initialize();
 	pObj->setActive(true);
 	AddObject(pObj);
 

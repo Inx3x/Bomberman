@@ -53,7 +53,7 @@ void Boss::Initialize()
 	m_Time = 0.0f;
 
 	Pattern_cnt = 0;
-	Key = "Boss";
+	Key = BOSS;
 }
 
 void Boss::Update()

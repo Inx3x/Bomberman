@@ -27,7 +27,7 @@ void Explosion::Initialize()
 	TransInfo.Scale = Vector3((float)strlen(Texture[0]), 3.0f);
 
 	Active = false;
-	Key = "Explosion";
+	Key = EXPLOSION;
 }
 
 void Explosion::Update()

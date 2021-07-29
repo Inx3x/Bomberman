@@ -21,7 +21,7 @@ void Bomb::Initialize()
 	TransInfo.Scale = Vector3((float)strlen(Texture[0]), 3.0f);
 
 	Active = false;
-	Key = "Bomb";
+	Key = BOMB;
 }
 
 void Bomb::Update()

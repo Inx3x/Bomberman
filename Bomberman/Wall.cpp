@@ -20,7 +20,7 @@ void Wall::Initialize()
 	TransInfo.Scale = Vector3((float)strlen(Texture[0]), 3.0f);
 
 	Active = false;
-	Key = "Wall";
+	Key = WALL;
 }
 
 void Wall::Update()

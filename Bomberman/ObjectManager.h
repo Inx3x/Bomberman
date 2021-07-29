@@ -9,7 +9,7 @@ private:
 	static ObjectManager* m_pInstance;
 
 	//¸Ê »ý¼º
-	map<string, list<Object*>> ObjectList;
+	map<OBJECT, list<Object*>> ObjectList;
 
 	int stage_cnt;
 	int wall_cnt;

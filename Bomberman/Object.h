@@ -4,7 +4,7 @@
 class Object
 {
 protected:
-	string Key;
+	OBJECT Key;
 	Transform TransInfo;
 	char* Texture[3];
 	int Color;
@@ -37,7 +37,7 @@ public:
 	}
 	void setBossExplosion(const int& _Boss_Explosion) { Boss_Explosion = _Boss_Explosion; }
 	
-	string GetKey() { return Key; }
+	OBJECT GetKey() { return Key; }
 	int getItemList() { return ItemList; }
 	bool getActive() { return Active; }
 	ULONGLONG gettTime() { return Time; }

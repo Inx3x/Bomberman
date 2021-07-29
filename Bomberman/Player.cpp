@@ -25,7 +25,7 @@ void Player::Initialize()
 	TransInfo.Position = Vector3(6.0f, 3.0f);
 	TransInfo.Scale = Vector3((float)strlen(Texture[0]), 3.0f);
 	Active = false;
-	Key = "Player";
+	Key = PLAYER;
 }
 
 void Player::Update()

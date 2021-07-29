@@ -25,7 +25,7 @@ ObjectManager::~ObjectManager()
 	Release();
 }
 void ObjectManager::AddObject(Object* _obj) {
-	map<string, list<Object*>>::iterator iter = ObjectList.find(_obj->GetKey());
+	map<OBJECT, list<Object*>>::iterator iter = ObjectList.find(_obj->GetKey());
 
 	if (iter == ObjectList.end()) {
 		list<Object*> TempList;
@@ -38,18 +38,21 @@ void ObjectManager::AddObject(Object* _obj) {
 	}
 }
 
+//map<string, list<Object*>>::iterator iter = ObjectList.find("Player");
+//list<Object*>::iterator iter2 = (*iter).second.begin();
+//(*(*ObjectList.find("Player")).second.begin())->getActive();
+
 void ObjectManager::Initialize()
 {
 	//플레이어개체 생성
 	AddObject(ObjectFactory<Player>::CreateObject());
-	(*(*ObjectList.find("Player")).second.begin())->setActive(true);
-
+	map<OBJECT, list<Object*>>::iterator iter = ObjectList.find(PLAYER);
+	(*(*ObjectList.find(PLAYER)).second.begin())->setActive(true);
 	//벽객체 생성
 	for (int i = 0; i < 128; i++) {
 		AddObject(ObjectFactory<Wall>::CreateObject());
 	}
 	createWall();
-
 	//폭탄 개체 생성
 	for (int i = 0; i < 16; i++) {
 		m_pBomb[i] = new Bomb;
@@ -58,7 +61,6 @@ void ObjectManager::Initialize()
 	}
 	bomb_cnt = 0;
 	bomb_capacity = 2;
-
 	//박스객체 생성
 	for (int i = 0; i < 64; i++) {
 		m_pBox[i] = new Box;
@@ -66,7 +68,6 @@ void ObjectManager::Initialize()
 		AddObject(m_pBox[i]);
 	}	
 	createBox();
-
 	//아이템객체 생성
 	for (int i = 0; i < 32; i++) {
 		m_pItem[i] = new Item;
@@ -76,7 +77,6 @@ void ObjectManager::Initialize()
 		item_hp[i] = 3;
 	}
 	item_cnt = 0;
-
 	//폭파 오브젝트 생성
 	for (int i = 0; i < 16; i++) {
 		for (int j = 0; j < 4; j++)
@@ -110,8 +110,7 @@ void ObjectManager::Initialize()
 		else if(i < 6)	m_pBossExplosion[i]->setExplosionDirection(DIRECTION_RIGHT);
 		else if(i < 9)	m_pBossExplosion[i]->setExplosionDirection(DIRECTION_LEFT);
 		else			m_pBossExplosion[i]->setExplosionDirection(DIRECTION_DOWN);
-	}
-	
+	}	
 	//에너미 생성
 	for (int i = 0; i < 16; i++)	{
 		m_pEnemy[i] = new Enemy;
@@ -124,21 +123,17 @@ void ObjectManager::Initialize()
 	m_pBoss = new Boss;
 	m_pBoss->Initialize();
 	AddObject(m_pBoss);
-	if (Scene::stage_No == BOSS) 	m_pBoss->setActive(true);
+	if (Scene::stage_No == STAGE_BOSS) 	m_pBoss->setActive(true);
 	
 	stage_cnt = 0;
 }
-
-//map<string, list<Object*>>::iterator iter = ObjectList.find("Player");
-//list<Object*>::iterator iter2 = (*iter).second.begin();
-//(*(*ObjectList.find("Player")).second.begin())->getActive();
 
 void ObjectManager::Update()
 {
 	//폭탄개수조정
 	setBombCnt();
 	//플레이어 업데이트
-	if ((*(*ObjectList.find("Player")).second.begin())->getActive())	(*(*ObjectList.find("Player")).second.begin())->Update();
+	if ((*(*ObjectList.find(PLAYER)).second.begin())->getActive())	(*(*ObjectList.find(PLAYER)).second.begin())->Update();
 	//아이템업데이트
 	for (int i = 0; i < 32; i++) {					
 		if (m_pItem[i]->getActive())	m_pItem[i]->Update();
@@ -178,8 +173,8 @@ void ObjectManager::Update()
 void ObjectManager::Render()
 {
 	//벽 출력
-	for (list<Object*>::iterator iterWall = (*ObjectList.find("Wall")).second.begin();
-		iterWall != (*ObjectList.find("Wall")).second.end(); ++iterWall)
+	for (list<Object*>::iterator iterWall = (*ObjectList.find(WALL)).second.begin();
+		iterWall != (*ObjectList.find(WALL)).second.end(); ++iterWall)
 	{
 		if ((*iterWall)->getActive())	(*iterWall)->Render();
 	}
@@ -192,7 +187,7 @@ void ObjectManager::Render()
 		if (m_pItem[i]->getActive())	m_pItem[i]->Render();
 	}
 	//플레이어 출력
-	if((*(*ObjectList.find("Player")).second.begin())->getActive())	(*(*ObjectList.find("Player")).second.begin())->Render();
+	if((*(*ObjectList.find(PLAYER)).second.begin())->getActive())	(*(*ObjectList.find(PLAYER)).second.begin())->Render();
 	//폭탄출력
 	for (int i = 0; i < 16; i++) {
 		if (m_pBomb[i]->getActive())	m_pBomb[i]->Render();
@@ -220,16 +215,16 @@ void ObjectManager::Render()
 void ObjectManager::Release()
 {
 	//Player Release
-	SAFE_RELEASE((*(*ObjectList.find("Player")).second.begin()));
-	(*ObjectList.find("Player")).second.clear();
+	SAFE_RELEASE((*(*ObjectList.find(PLAYER)).second.begin()));
+	(*ObjectList.find(PLAYER)).second.clear();
 
 	//Wall Release
-	for (list<Object*>::iterator iterWall = (*ObjectList.find("Wall")).second.begin();
-		iterWall != (*ObjectList.find("Wall")).second.end(); ++iterWall)
+	for (list<Object*>::iterator iterWall = (*ObjectList.find(WALL)).second.begin();
+		iterWall != (*ObjectList.find(WALL)).second.end(); ++iterWall)
 	{
 		SAFE_RELEASE((*iterWall));
 	}
-	(*ObjectList.find("Wall")).second.clear();
+	(*ObjectList.find(WALL)).second.clear();
 
 	//Box Release
 	for (int i = 0; i < 64; i++) {
@@ -259,10 +254,10 @@ void ObjectManager::Release()
 //벽 생성
 void ObjectManager::createWall()
 {
-	Transform m_pWall_TransInfo = (*(*ObjectList.find("Wall")).second.begin())->GetTransform();
+	Transform m_pWall_TransInfo = (*(*ObjectList.find(WALL)).second.begin())->GetTransform();
 
 	//벽 위치 설정
-	list<Object*>::iterator iterWall = (*ObjectList.find("Wall")).second.begin();
+	list<Object*>::iterator iterWall = (*ObjectList.find(WALL)).second.begin();
 	for (int i = 0; i < 17; i++) {
 		for (int j = 0; j < 17; j++) {
 			if (i == 0 || i == 16) {
@@ -306,7 +301,7 @@ void ObjectManager::createBox()
 	//박스 위치 설정
 	switch (Scene::stage_No)
 	{
-	case HIDDEN:
+	case STAGE_HIDDEN:
 		break;
 	case STAGE_1:
 		for (int i = 0; i < 17; i++) {
@@ -344,7 +339,7 @@ void ObjectManager::createBox()
 			m_pBox_TransInfo.Position.y += OBJ_SIZE_Y;
 		}
 		break;
-	case BOSS:
+	case STAGE_BOSS:
 		for (int i = 0; i < 17; i++) {
 			for (int j = 0; j < 17; j++) {
 				if (i % 2 == 1 && j % 2 == 0) {
@@ -383,7 +378,7 @@ void ObjectManager::createEnemy()
 
 	switch (Scene::stage_No)
 	{
-	case HIDDEN:
+	case STAGE_HIDDEN:
 		break;
 	case STAGE_1:
 		for (int i = 0; i < 17; i++) {
@@ -423,7 +418,7 @@ void ObjectManager::createEnemy()
 			m_pEnemy_TransInfo.Position.y += OBJ_SIZE_Y;
 		}
 		break;
-	case BOSS:
+	case STAGE_BOSS:
 		Enemy_cnt++;
 		break;
 	}
@@ -436,7 +431,7 @@ void ObjectManager::createBomb()
 	bool conllision_bomb = false;
 	bool bomb_capacity_over = false;
 	for (int i = 0; i < 16; i++) {
-		if (CollisionManager::CollisionRact((*(*ObjectList.find("Player")).second.begin())->GetTransform(), m_pBomb[i]->GetTransform())) {
+		if (CollisionManager::CollisionRact((*(*ObjectList.find(PLAYER)).second.begin())->GetTransform(), m_pBomb[i]->GetTransform())) {
 			conllision_bomb = true;
 			break;
 		}
@@ -446,7 +441,7 @@ void ObjectManager::createBomb()
 	if (!conllision_bomb && bomb_capacity_over) {
 		for (int i = 0; i < 16; i++) {
 			if (!m_pBomb[i]->getActive()) {
-				Transform m_pBomb_TransInfo = bombTransInfo((*(*ObjectList.find("Player")).second.begin())->GetTransform());
+				Transform m_pBomb_TransInfo = bombTransInfo((*(*ObjectList.find(PLAYER)).second.begin())->GetTransform());
 				m_pBomb[i]->setActive(true);
 				m_pBomb[i]->SetPosition(m_pBomb_TransInfo.Position.x, m_pBomb_TransInfo.Position.y);
 				m_pBomb[i]->setTime(GetTickCount64());
@@ -528,8 +523,8 @@ void ObjectManager::explosionCollision()
 	bool collision = false;
 	
 	//폭파 벽 충돌
-	for (list<Object*>::iterator iterWall = (*ObjectList.find("Wall")).second.begin();
-		iterWall != (*ObjectList.find("Wall")).second.end(); iterWall++) {
+	for (list<Object*>::iterator iterWall = (*ObjectList.find(WALL)).second.begin();
+		iterWall != (*ObjectList.find(WALL)).second.end(); iterWall++) {
 		for (int j = 0; j < 16; j++) {
 			for (int k = 0; k < 4; k++) {
 				if ((*iterWall)->getActive() && m_pExplosion[j][k]->getActive() &&
@@ -572,7 +567,7 @@ void ObjectManager::explosionCollision()
 	for (int j = 0; j < 16; j++) {
 		for (int k = 0; k < 4; k++) {
 			if (m_pExplosion[j][k]->getActive() && 
-				CollisionManager::CollisionRact((*(*ObjectList.find("Player")).second.begin())->GetTransform(), m_pExplosion[j][k]->GetTransform())) {
+				CollisionManager::CollisionRact((*(*ObjectList.find(PLAYER)).second.begin())->GetTransform(), m_pExplosion[j][k]->GetTransform())) {
 				Player::PlayerHp = EMPTYHP;
 			}
 		}
@@ -580,7 +575,7 @@ void ObjectManager::explosionCollision()
 	//보스 스킬 플레이어 충돌
 	for (int i = 0; i < 16; i++) {
 		if (m_pBossExplosion[i]->getActive() && !collision &&
-			CollisionManager::CollisionRact((*(*ObjectList.find("Player")).second.begin())->GetTransform(), m_pBossExplosion[i]->GetTransform())) {
+			CollisionManager::CollisionRact((*(*ObjectList.find(PLAYER)).second.begin())->GetTransform(), m_pBossExplosion[i]->GetTransform())) {
 			Player::PlayerHp = EMPTYHP;
 		}
 	}
@@ -648,16 +643,16 @@ bool ObjectManager::playerCollision()
 	bool collision = false;
 
 	//플레이어 벽 충돌
-	for (list<Object*>::iterator iterWall = (*ObjectList.find("Wall")).second.begin();
-		iterWall != (*ObjectList.find("Wall")).second.end(); ++iterWall) {
-		if (CollisionManager::CollisionRact((*(*ObjectList.find("Player")).second.begin())->GetTransform(), (*iterWall)->GetTransform())) {
+	for (list<Object*>::iterator iterWall = (*ObjectList.find(WALL)).second.begin();
+		iterWall != (*ObjectList.find(WALL)).second.end(); ++iterWall) {
+		if (CollisionManager::CollisionRact((*(*ObjectList.find(PLAYER)).second.begin())->GetTransform(), (*iterWall)->GetTransform())) {
 			collision = true;
 			break;
 		}
 	}
 	//플레이어 상자 충돌
 	for (int i = 0; i < box_cnt; i++) {
-		if (CollisionManager::CollisionRact((*(*ObjectList.find("Player")).second.begin())->GetTransform(), m_pBox[i]->GetTransform())) {
+		if (CollisionManager::CollisionRact((*(*ObjectList.find(PLAYER)).second.begin())->GetTransform(), m_pBox[i]->GetTransform())) {
 			collision = true;
 			break;
 		}
@@ -665,7 +660,7 @@ bool ObjectManager::playerCollision()
 	//플레이어 적들 충돌
 	for (int i = 0; i < 16; i++) {
 		if (m_pEnemy[i]->getActive() && 
-			CollisionManager::CollisionRact((*(*ObjectList.find("Player")).second.begin())->GetTransform(), m_pEnemy[i]->GetTransform())) {
+			CollisionManager::CollisionRact((*(*ObjectList.find(PLAYER)).second.begin())->GetTransform(), m_pEnemy[i]->GetTransform())) {
 			Player::PlayerHp = EMPTYHP;
 			collision = true;
 			break;
@@ -673,13 +668,13 @@ bool ObjectManager::playerCollision()
 	}
 	//플레이어 보스 충돌
 	if(m_pBoss->getActive() && 
-		CollisionManager::CollisionRact((*(*ObjectList.find("Player")).second.begin())->GetTransform(), m_pBoss->GetTransform())) {
+		CollisionManager::CollisionRact((*(*ObjectList.find(PLAYER)).second.begin())->GetTransform(), m_pBoss->GetTransform())) {
 		Player::PlayerHp = EMPTYHP;
 	}
 	//플레이어 아이템 충돌
 	for (int i = 0; i < 32; i++) {
 		if (m_pItem[i]->getActive() && !collision &&
-			CollisionManager::CollisionRact(m_pItem[i]->GetTransform(), (*(*ObjectList.find("Player")).second.begin())->GetTransform())) {
+			CollisionManager::CollisionRact(m_pItem[i]->GetTransform(), (*(*ObjectList.find(PLAYER)).second.begin())->GetTransform())) {
 			m_pItem[i]->setActive(false);
 			m_pItem[i]->SetPosition(0, 0);
 			switch (m_pItem[i]->getItemList())
@@ -726,8 +721,8 @@ bool ObjectManager::explosionRange(const int& _direction)
 	case DIRECTION_UP:
 		for (int i = 0; i < 16; i++) {
 			if (m_pExplosion[i][DIRECTION_UP]->getActive()) {
-				for (list<Object*>::iterator iterWall = (*ObjectList.find("Wall")).second.begin();
-					iterWall != (*ObjectList.find("Wall")).second.end(); ++iterWall) {
+				for (list<Object*>::iterator iterWall = (*ObjectList.find(WALL)).second.begin();
+					iterWall != (*ObjectList.find(WALL)).second.end(); ++iterWall) {
 					if (CollisionManager::CollisionRact(m_pExplosion[i][DIRECTION_UP]->GetTransform(), 
 						(*iterWall)->GetTransform())) {
 						collision = true;
@@ -747,8 +742,8 @@ bool ObjectManager::explosionRange(const int& _direction)
 	case DIRECTION_RIGHT:
 		for (int i = 0; i < 16; i++) {
 			if (m_pExplosion[i][DIRECTION_RIGHT]->getActive()) {
-				for (list<Object*>::iterator iterWall = (*ObjectList.find("Wall")).second.begin();
-					iterWall != (*ObjectList.find("Wall")).second.end(); ++iterWall) {
+				for (list<Object*>::iterator iterWall = (*ObjectList.find(WALL)).second.begin();
+					iterWall != (*ObjectList.find(WALL)).second.end(); ++iterWall) {
 					if (CollisionManager::CollisionRact(m_pExplosion[i][DIRECTION_RIGHT]->GetTransform(),
 						(*iterWall)->GetTransform())) {
 						collision = true;
@@ -768,8 +763,8 @@ bool ObjectManager::explosionRange(const int& _direction)
 	case DIRECTION_LEFT:
 		for (int i = 0; i < 16; i++) {
 			if (m_pExplosion[i][DIRECTION_LEFT]->getActive()) {
-				for (list<Object*>::iterator iterWall = (*ObjectList.find("Wall")).second.begin();
-					iterWall != (*ObjectList.find("Wall")).second.end(); ++iterWall) {
+				for (list<Object*>::iterator iterWall = (*ObjectList.find(WALL)).second.begin();
+					iterWall != (*ObjectList.find(WALL)).second.end(); ++iterWall) {
 					if (CollisionManager::CollisionRact(m_pExplosion[i][DIRECTION_LEFT]->GetTransform(),
 						(*iterWall)->GetTransform())) {
 						collision = true;
@@ -789,8 +784,8 @@ bool ObjectManager::explosionRange(const int& _direction)
 	case DIRECTION_DOWN:
 		for (int i = 0; i < 16; i++) {
 			if (m_pExplosion[i][DIRECTION_DOWN]->getActive()) {
-				for (list<Object*>::iterator iterWall = (*ObjectList.find("Wall")).second.begin();
-					iterWall != (*ObjectList.find("Wall")).second.end(); ++iterWall) {
+				for (list<Object*>::iterator iterWall = (*ObjectList.find(WALL)).second.begin();
+					iterWall != (*ObjectList.find(WALL)).second.end(); ++iterWall) {
 					if (CollisionManager::CollisionRact(m_pExplosion[i][DIRECTION_DOWN]->GetTransform(),
 						(*iterWall)->GetTransform())) {
 						collision = true;
@@ -818,7 +813,7 @@ bool ObjectManager::enemyCollision(){
 	//적들 플레이어 충돌
 	for (int i = 0; i < 16; i++) {
 		if (m_pEnemy[i]->getActive() &&
-			CollisionManager::CollisionRact((*(*ObjectList.find("Player")).second.begin())->GetTransform(), m_pEnemy[i]->GetTransform())) {
+			CollisionManager::CollisionRact((*(*ObjectList.find(PLAYER)).second.begin())->GetTransform(), m_pEnemy[i]->GetTransform())) {
 			Player::PlayerHp = EMPTYHP;
 			collision = true;
 			break;
@@ -826,8 +821,8 @@ bool ObjectManager::enemyCollision(){
 	}
 	//적들 벽 충돌
 	for (int j = 0; j < 16; j++) {
-		for (list<Object*>::iterator iterWall = (*ObjectList.find("Wall")).second.begin();
-			iterWall != (*ObjectList.find("Wall")).second.end(); ++iterWall) {
+		for (list<Object*>::iterator iterWall = (*ObjectList.find(WALL)).second.begin();
+			iterWall != (*ObjectList.find(WALL)).second.end(); ++iterWall) {
 			if (m_pEnemy[j]->getActive() && CollisionManager::CollisionRact(m_pEnemy[j]->GetTransform(), (*iterWall)->GetTransform())) {
 				collision = true;
 				break;
@@ -885,7 +880,7 @@ bool ObjectManager::bossCollision()
 	if (m_pBoss->GetPosition().x < 0 || m_pBoss->GetPosition().x > 84.0f || m_pBoss->GetPosition().y < 0 || m_pBoss->GetPosition().y > 42.0f)
 		collision = true;
 	//보스 플레이어 충돌
-	if (CollisionManager::CollisionRact((*(*ObjectList.find("Player")).second.begin())->GetTransform(), m_pBoss->GetTransform())) {
+	if (CollisionManager::CollisionRact((*(*ObjectList.find(PLAYER)).second.begin())->GetTransform(), m_pBoss->GetTransform())) {
 		Player::PlayerHp = EMPTYHP;
 	}
 	//보스 아이템 충돌
@@ -902,7 +897,7 @@ bool ObjectManager::bossCollision()
 //보스 타게팅
 Vector3 ObjectManager::bossTargetMove()
 {
-	Vector3 vTarget = (*(*ObjectList.find("Player")).second.begin())->GetPosition();
+	Vector3 vTarget = (*(*ObjectList.find(PLAYER)).second.begin())->GetPosition();
 	Vector3 vBoss = m_pBoss->GetPosition();
 
 	float x = vTarget.x - vBoss.x;

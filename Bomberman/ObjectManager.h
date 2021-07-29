@@ -12,8 +12,6 @@ private:
 	map<string, list<Object*>> ObjectList;
 
 	int stage_cnt;
-
-	//Object* m_pWall[128];
 	int wall_cnt;
 
 	Object* m_pBox[64];

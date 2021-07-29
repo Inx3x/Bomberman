@@ -40,10 +40,6 @@ void ObjectManager::AddObject(Object* _obj) {
 
 void ObjectManager::Initialize()
 {
-	//AddObject에 오브젝트팩토리 바로넣기로 수정계획
-	//setActive수정
-	//m_pObject->setActive(true);
-
 	//플레이어개체 생성
 	AddObject(ObjectFactory<Player>::CreateObject());
 	(*(*ObjectList.find("Player")).second.begin())->setActive(true);
@@ -52,21 +48,7 @@ void ObjectManager::Initialize()
 	for (int i = 0; i < 128; i++) {
 		AddObject(ObjectFactory<Wall>::CreateObject());
 	}
-	/*
-	for (list<Object*>::iterator iterWall = (*ObjectList.find("Wall")).second.begin(); 
-		iterWall != (*ObjectList.find("Wall")).second.end(); ++iterWall)
-	{
-		(*iterWall)->setActive(true);
-	}
-	*/
 	createWall();
-	/*
-	for (int i = 0; i < 128; i++) {
-		m_pWall[i] = new Wall;
-		m_pWall[i]->Initialize();
-		AddObject(m_pWall[i]);
-	}
-	*/
 
 	//폭탄 개체 생성
 	for (int i = 0; i < 16; i++) {
@@ -196,17 +178,11 @@ void ObjectManager::Update()
 void ObjectManager::Render()
 {
 	//벽 출력
-	//list<Object*>::iterator iterWall = (*ObjectList.find("Wall")).second.begin();
 	for (list<Object*>::iterator iterWall = (*ObjectList.find("Wall")).second.begin();
 		iterWall != (*ObjectList.find("Wall")).second.end(); ++iterWall)
 	{
 		if ((*iterWall)->getActive())	(*iterWall)->Render();
 	}
-	/*
-	for (int i = 0; i < wall_cnt; i++) {
-		if (m_pWall[i]->getActive())	m_pWall[i]->Render();
-	}
-	*/
 	//상자 출력
 	for (int i = 0; i < box_cnt; i++) {
 		if(m_pBox[i]->getActive())		m_pBox[i]->Render();
@@ -259,6 +235,7 @@ void ObjectManager::Release()
 	for (int i = 0; i < 64; i++) {
 		SAFE_RELEASE(m_pBox[i]);
 	}
+
 	for (int i = 0; i < 32; i++) {
 		SAFE_RELEASE(m_pItem[i]);
 	}
@@ -282,16 +259,7 @@ void ObjectManager::Release()
 //벽 생성
 void ObjectManager::createWall()
 {
-	//Transform m_pWall_TransInfo = m_pWall[0]->GetTransform();
-	/*
-	for (list<Object*>::iterator iter = (*ObjectList.find("Wall")).second.begin();
-		iter != (*ObjectList.find("Wall")).second.end(); ++iter)
-	{
-		if ((*iter)->getActive())	(*iter)->Render();
-	}
-	*/
 	Transform m_pWall_TransInfo = (*(*ObjectList.find("Wall")).second.begin())->GetTransform();
-	wall_cnt = 0;
 
 	//벽 위치 설정
 	list<Object*>::iterator iterWall = (*ObjectList.find("Wall")).second.begin();
@@ -302,7 +270,6 @@ void ObjectManager::createWall()
 				(*iterWall)->SetPosition(
 					m_pWall_TransInfo.Position.x,
 					m_pWall_TransInfo.Position.y);
-				//wall_cnt++;
 				iterWall++;
 			}
 			else if (i % 2 == 1) {
@@ -311,7 +278,6 @@ void ObjectManager::createWall()
 					(*iterWall)->SetPosition(
 						m_pWall_TransInfo.Position.x,
 						m_pWall_TransInfo.Position.y);
-					//wall_cnt++;
 					iterWall++;
 				}
 			}
@@ -321,7 +287,6 @@ void ObjectManager::createWall()
 					(*iterWall)->SetPosition(
 						m_pWall_TransInfo.Position.x,
 						m_pWall_TransInfo.Position.y);
-					//wall_cnt++;
 					iterWall++;
 				}
 			}
@@ -561,9 +526,10 @@ void ObjectManager::createBossExplosion(const Vector3& _TransInfoPosition)
 void ObjectManager::explosionCollision()
 {
 	bool collision = false;
-	list<Object*>::iterator iterWall = (*ObjectList.find("Wall")).second.begin();
+	
 	//폭파 벽 충돌
-	for (int i = 0; i < wall_cnt; i++) {
+	for (list<Object*>::iterator iterWall = (*ObjectList.find("Wall")).second.begin();
+		iterWall != (*ObjectList.find("Wall")).second.end(); iterWall++) {
 		for (int j = 0; j < 16; j++) {
 			for (int k = 0; k < 4; k++) {
 				if ((*iterWall)->getActive() && m_pExplosion[j][k]->getActive() &&
@@ -573,7 +539,6 @@ void ObjectManager::explosionCollision()
 				}
 			}
 		}
-		iterWall++;
 	}
 	//폭파 적들 충돌
 	for (int i = 0; i < 16; i++) {
@@ -683,14 +648,12 @@ bool ObjectManager::playerCollision()
 	bool collision = false;
 
 	//플레이어 벽 충돌
-	//list<Object*>::iterator iterWall = (*ObjectList.find("Wall")).second.begin();
 	for (list<Object*>::iterator iterWall = (*ObjectList.find("Wall")).second.begin();
 		iterWall != (*ObjectList.find("Wall")).second.end(); ++iterWall) {
 		if (CollisionManager::CollisionRact((*(*ObjectList.find("Player")).second.begin())->GetTransform(), (*iterWall)->GetTransform())) {
 			collision = true;
 			break;
 		}
-		//iterWall++;
 	}
 	//플레이어 상자 충돌
 	for (int i = 0; i < box_cnt; i++) {
@@ -761,7 +724,6 @@ bool ObjectManager::explosionRange(const int& _direction)
 	switch (_direction)
 	{
 	case DIRECTION_UP:
-		//iterWall = (*ObjectList.find("Wall")).second.begin();
 		for (int i = 0; i < 16; i++) {
 			if (m_pExplosion[i][DIRECTION_UP]->getActive()) {
 				for (list<Object*>::iterator iterWall = (*ObjectList.find("Wall")).second.begin();
@@ -771,7 +733,6 @@ bool ObjectManager::explosionRange(const int& _direction)
 						collision = true;
 						break;
 					}
-					//iterWall++;
 				}
 			}			
 		}
@@ -784,7 +745,6 @@ bool ObjectManager::explosionRange(const int& _direction)
 		}
 		break;
 	case DIRECTION_RIGHT:
-		//iterWall = (*ObjectList.find("Wall")).second.begin();
 		for (int i = 0; i < 16; i++) {
 			if (m_pExplosion[i][DIRECTION_RIGHT]->getActive()) {
 				for (list<Object*>::iterator iterWall = (*ObjectList.find("Wall")).second.begin();
@@ -794,7 +754,6 @@ bool ObjectManager::explosionRange(const int& _direction)
 						collision = true;
 						break;
 					}
-					//iterWall++;
 				}
 			}
 		}
@@ -807,7 +766,6 @@ bool ObjectManager::explosionRange(const int& _direction)
 		}
 		break;
 	case DIRECTION_LEFT:
-		//iterWall = (*ObjectList.find("Wall")).second.begin();
 		for (int i = 0; i < 16; i++) {
 			if (m_pExplosion[i][DIRECTION_LEFT]->getActive()) {
 				for (list<Object*>::iterator iterWall = (*ObjectList.find("Wall")).second.begin();
@@ -817,7 +775,6 @@ bool ObjectManager::explosionRange(const int& _direction)
 						collision = true;
 						break;
 					}
-					//iterWall++;
 				}
 			}
 		}
@@ -830,7 +787,6 @@ bool ObjectManager::explosionRange(const int& _direction)
 		}
 		break;
 	case DIRECTION_DOWN:
-		//iterWall = (*ObjectList.find("Wall")).second.begin();
 		for (int i = 0; i < 16; i++) {
 			if (m_pExplosion[i][DIRECTION_DOWN]->getActive()) {
 				for (list<Object*>::iterator iterWall = (*ObjectList.find("Wall")).second.begin();
@@ -840,7 +796,6 @@ bool ObjectManager::explosionRange(const int& _direction)
 						collision = true;
 						break;
 					}
-					//iterWall++;
 				}
 			}
 		}
@@ -870,7 +825,6 @@ bool ObjectManager::enemyCollision(){
 		}
 	}
 	//적들 벽 충돌
-	list<Object*>::iterator iterWall = (*ObjectList.find("Wall")).second.begin();
 	for (int j = 0; j < 16; j++) {
 		for (list<Object*>::iterator iterWall = (*ObjectList.find("Wall")).second.begin();
 			iterWall != (*ObjectList.find("Wall")).second.end(); ++iterWall) {
@@ -878,7 +832,6 @@ bool ObjectManager::enemyCollision(){
 				collision = true;
 				break;
 			}
-			//iterWall++;
 		}
 	}
 	//적들 상자 충돌

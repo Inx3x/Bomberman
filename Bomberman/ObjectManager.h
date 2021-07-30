@@ -42,6 +42,7 @@ public:
 	}
 
 	void AddObject(Object* _obj);
+	bool ExceptionHandling(OBJECT _obj);
 	void Initialize();
 	void Update();
 	void Render();

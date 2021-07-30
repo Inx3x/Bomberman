@@ -38,6 +38,17 @@ void ObjectManager::AddObject(Object* _obj) {
 	}
 }
 
+bool ObjectManager::ExceptionHandling(OBJECT _obj)
+{
+	if (ObjectList.find(PLAYER) != ObjectList.end()) {
+		if (ObjectList.find(PLAYER)->second.begin() != ObjectList.find(PLAYER)->second.end()) {
+			return true;
+		}	
+		else return false;
+	}
+	else return false;
+}
+
 //map<string, list<Object*>>::iterator iter = ObjectList.find("Player");
 //list<Object*>::iterator iter2 = (*iter).second.begin();
 //(*(*ObjectList.find("Player")).second.begin())->getActive();
@@ -46,8 +57,13 @@ void ObjectManager::Initialize()
 {
 	//플레이어개체 생성
 	AddObject(ObjectFactory<Player>::CreateObject());
-	map<OBJECT, list<Object*>>::iterator iter = ObjectList.find(PLAYER);
-	(*(*ObjectList.find(PLAYER)).second.begin())->setActive(true);
+	if (ExceptionHandling(PLAYER)) {
+		(*ObjectList.find(PLAYER)->second.begin())->setActive(true);
+	}
+	else {
+		exit(NULL);
+	}
+
 	//벽객체 생성
 	for (int i = 0; i < 128; i++) {
 		AddObject(ObjectFactory<Wall>::CreateObject());
@@ -133,7 +149,12 @@ void ObjectManager::Update()
 	//폭탄개수조정
 	setBombCnt();
 	//플레이어 업데이트
-	if ((*(*ObjectList.find(PLAYER)).second.begin())->getActive())	(*(*ObjectList.find(PLAYER)).second.begin())->Update();
+	if (ExceptionHandling(PLAYER)) {
+		if ((*ObjectList.find(PLAYER)->second.begin())->getActive())	(*ObjectList.find(PLAYER)->second.begin())->Update();
+	}
+	else {
+		exit(NULL);
+	}
 	//아이템업데이트
 	for (int i = 0; i < 32; i++) {					
 		if (m_pItem[i]->getActive())	m_pItem[i]->Update();
@@ -187,7 +208,12 @@ void ObjectManager::Render()
 		if (m_pItem[i]->getActive())	m_pItem[i]->Render();
 	}
 	//플레이어 출력
-	if((*(*ObjectList.find(PLAYER)).second.begin())->getActive())	(*(*ObjectList.find(PLAYER)).second.begin())->Render();
+	if (ExceptionHandling(PLAYER)) {
+		if ((*ObjectList.find(PLAYER)->second.begin())->getActive())	(*ObjectList.find(PLAYER)->second.begin())->Render();
+	}
+	else {
+		exit(NULL);
+	}
 	//폭탄출력
 	for (int i = 0; i < 16; i++) {
 		if (m_pBomb[i]->getActive())	m_pBomb[i]->Render();
@@ -215,8 +241,13 @@ void ObjectManager::Render()
 void ObjectManager::Release()
 {
 	//Player Release
-	SAFE_RELEASE((*(*ObjectList.find(PLAYER)).second.begin()));
-	(*ObjectList.find(PLAYER)).second.clear();
+	if (ExceptionHandling(PLAYER)) {
+		SAFE_RELEASE((*ObjectList.find(PLAYER)->second.begin()));
+		ObjectList.find(PLAYER)->second.clear();
+	}
+	else {
+		exit(NULL);
+	}
 
 	//Wall Release
 	for (list<Object*>::iterator iterWall = (*ObjectList.find(WALL)).second.begin();

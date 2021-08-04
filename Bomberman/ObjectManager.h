@@ -8,7 +8,7 @@ private:
 	ObjectManager();
 	static ObjectManager* m_pInstance;
 
-	//¸Ê »ý¼º
+	//map<> create
 	map<OBJECT, list<Object*>> ObjectList;
 
 	int stage_cnt;

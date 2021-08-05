@@ -67,6 +67,11 @@ void ObjectManager::Initialize()
 		AddObject(ObjectFactory<Wall>::CreateObject());
 	}
 	createWall();
+	//Box Object Initialize
+	for (int i = 0; i < 64; i++) {
+		AddObject(ObjectFactory<Box>::CreateObject());
+	}
+	createBox();
 	//폭탄 개체 생성
 	for (int i = 0; i < 16; i++) {
 		m_pBomb[i] = new Bomb;
@@ -75,19 +80,10 @@ void ObjectManager::Initialize()
 	}
 	bomb_cnt = 0;
 	bomb_capacity = 2;
-	//박스객체 생성
-	for (int i = 0; i < 64; i++) {
-		m_pBox[i] = new Box;
-		m_pBox[i]->Initialize();
-		AddObject(m_pBox[i]);
-	}
-	createBox();
-	//아이템객체 생성
+	//Item Object Initialize
 	for (int i = 0; i < 32; i++) {
-		m_pItem[i] = new Item;
-		m_pItem[i]->Initialize();
+		AddObject(ObjectFactory<Item>::CreateObject());
 		m_pItem[i]->setActive(true);
-		AddObject(m_pItem[i]);
 		item_hp[i] = 3;
 	}
 	item_cnt = 0;
@@ -153,9 +149,10 @@ void ObjectManager::Update()
 	else {
 		exit(NULL);
 	}
-	//아이템업데이트
-	for (int i = 0; i < 32; i++) {
-		if (m_pItem[i]->getActive())	m_pItem[i]->Update();
+	//Item Update
+	for (list<Object*>::iterator iterItem = ObjectList.find(ITEM)->second.begin();
+		iterItem != ObjectList.find(ITEM)->second.end(); ++iterItem) {
+		if ((*iterItem)->getActive())	(*iterItem)->Update();
 	}
 	//폭탄 업데이트
 	for (int i = 0; i < 16; i++) {
@@ -197,14 +194,21 @@ void ObjectManager::Render()
 	{
 		if ((*iterWall)->getActive())	(*iterWall)->Render();
 	}
-	//상자 출력
-	for (int i = 0; i < box_cnt; i++) {
-		if (m_pBox[i]->getActive())		m_pBox[i]->Render();
+	//Box Render
+	for (list<Object*>::iterator iterBox = ObjectList.find(BOX)->second.begin();
+		iterBox != ObjectList.find(BOX)->second.end(); ++iterBox) {
+		if ((*iterBox)->getActive())	(*iterBox)->Render();
 	}
-	//아이템 출력
+	//Item Render
+	for (list<Object*>::iterator iterItem = ObjectList.find(ITEM)->second.begin();
+		iterItem != ObjectList.find(ITEM)->second.end(); ++iterItem) {
+		if ((*iterItem)->getActive())	(*iterItem)->Render();
+	}
+	/*
 	for (int i = 0; i < item_cnt; i++) {
 		if (m_pItem[i]->getActive())	m_pItem[i]->Render();
 	}
+	*/
 	//Player Render
 	if (ExceptionHandling(PLAYER)) {
 		if ((*ObjectList.find(PLAYER)->second.begin())->getActive())	(*ObjectList.find(PLAYER)->second.begin())->Render();
@@ -256,13 +260,25 @@ void ObjectManager::Release()
 	ObjectList.find(WALL)->second.clear();
 
 	//Box Release
-	for (int i = 0; i < 64; i++) {
-		SAFE_RELEASE(m_pBox[i]);
+	for (list<Object*>::iterator iterBox = ObjectList.find(BOX)->second.begin();
+		iterBox != ObjectList.find(BOX)->second.end(); ++iterBox)
+	{
+		SAFE_RELEASE((*iterBox));
 	}
+	ObjectList.find(BOX)->second.clear();
 
+	//Item Release
+	for (list<Object*>::iterator iterItem = ObjectList.find(ITEM)->second.begin();
+		iterItem != ObjectList.find(ITEM)->second.end(); ++iterItem)
+	{
+		SAFE_RELEASE((*iterItem));
+	}
+	ObjectList.find(ITEM)->second.clear();
+	/*
 	for (int i = 0; i < 32; i++) {
 		SAFE_RELEASE(m_pItem[i]);
 	}
+	*/
 	for (int i = 0; i < 16; i++) {
 		SAFE_RELEASE(m_pBomb[i]);
 	}
@@ -321,13 +337,13 @@ void ObjectManager::createWall()
 	}
 }
 
-//박스 생성
+//Create Box
 void ObjectManager::createBox()
 {
-	Transform m_pBox_TransInfo = m_pBox[0]->GetTransform();
-	box_cnt = 0;
+	Transform m_pBox_TransInfo = (*ObjectList.find(BOX)->second.begin())->GetTransform();
 
-	//박스 위치 설정
+	//Box Position Setting
+	list<Object*>::iterator iterBox = ObjectList.find(BOX)->second.begin();
 	switch (Scene::stage_No)
 	{
 	case STAGE_HIDDEN:
@@ -337,11 +353,11 @@ void ObjectManager::createBox()
 			for (int j = 0; j < 17; j++) {
 				if (i % 2 == 0 && j % 2 == 1) {
 					if (i != 0 && j != 1 && i != 16 && j != 15) {
-						m_pBox[box_cnt]->SetPosition(
+						(*iterBox)->SetPosition(
 							m_pBox_TransInfo.Position.x,
 							m_pBox_TransInfo.Position.y);
-						m_pBox[box_cnt]->setActive(true);
-						box_cnt++;
+						(*iterBox)->setActive(true);
+						iterBox++;
 					}
 				}
 				m_pBox_TransInfo.Position.x += OBJ_SIZE_X;
@@ -355,11 +371,11 @@ void ObjectManager::createBox()
 			for (int j = 0; j < 17; j++) {
 				if (i % 2 == 1 && j % 2 == 0) {
 					if (i != 1 && j != 0 && i != 15 && j != 16) {
-						m_pBox[box_cnt]->SetPosition(
+						(*iterBox)->SetPosition(
 							m_pBox_TransInfo.Position.x,
 							m_pBox_TransInfo.Position.y);
-						m_pBox[box_cnt]->setActive(true);
-						box_cnt++;
+						(*iterBox)->setActive(true);
+						iterBox++;
 					}
 				}
 				m_pBox_TransInfo.Position.x += OBJ_SIZE_X;
@@ -373,11 +389,11 @@ void ObjectManager::createBox()
 			for (int j = 0; j < 17; j++) {
 				if (i % 2 == 1 && j % 2 == 0) {
 					if (i != 1 && j != 0 && i != 15 && j != 16) {
-						m_pBox[box_cnt]->SetPosition(
+						(*iterBox)->SetPosition(
 							m_pBox_TransInfo.Position.x,
 							m_pBox_TransInfo.Position.y);
-						m_pBox[box_cnt]->setActive(true);
-						box_cnt++;
+						(*iterBox)->setActive(true);
+						iterBox++;
 					}
 				}
 				m_pBox_TransInfo.Position.x += OBJ_SIZE_X;
@@ -389,7 +405,7 @@ void ObjectManager::createBox()
 	}
 }
 
-//아이템 생성
+//Item Create
 void ObjectManager::createItem(const Transform& _m_pBox_TransInfo)
 {
 	m_pItem[item_cnt]->SetPosition(_m_pBox_TransInfo.Position.x, _m_pBox_TransInfo.Position.y);
@@ -585,15 +601,16 @@ void ObjectManager::explosionCollision()
 			}
 		}
 	}
-	//폭파 상자 충돌
-	for (int i = 0; i < box_cnt; i++) {
+	//Expolosion Box Collision
+	for (list<Object*>::iterator iterBox = ObjectList.find(BOX)->second.begin();
+		iterBox != ObjectList.find(BOX)->second.end(); iterBox++) {
 		for (int j = 0; j < 16; j++) {
 			for (int k = 0; k < 4; k++) {
-				if (m_pBox[i]->getActive() && m_pExplosion[j][k]->getActive() &&
-					CollisionManager::CollisionRact(m_pBox[i]->GetTransform(), m_pExplosion[j][k]->GetTransform())) {
-					m_pBox[i]->setActive(false);
-					if (rand() % 10 < 3)	createItem(m_pBox[i]->GetTransform());		//30프로확률로 아이템생성
-					m_pBox[i]->SetPosition(0, 0);
+				if ((*iterBox)->getActive() && m_pExplosion[j][k]->getActive() &&
+					CollisionManager::CollisionRact((*iterBox)->GetTransform(), m_pExplosion[j][k]->GetTransform())) {
+					(*iterBox)->setActive(false);
+					if (rand() % 10 < 3)	createItem((*iterBox)->GetTransform());		//30프로확률로 아이템생성
+					(*iterBox)->SetPosition(0, 0);
 				}
 			}
 		}
@@ -685,9 +702,10 @@ bool ObjectManager::playerCollision()
 			break;
 		}
 	}
-	//플레이어 상자 충돌
-	for (int i = 0; i < box_cnt; i++) {
-		if (CollisionManager::CollisionRact((*ObjectList.find(PLAYER)->second.begin())->GetTransform(), m_pBox[i]->GetTransform())) {
+	//Player Box Collision
+	for (list<Object*>::iterator iterBox = ObjectList.find(BOX)->second.begin();
+		iterBox != ObjectList.find(BOX)->second.end(); ++iterBox) {
+		if (CollisionManager::CollisionRact((*ObjectList.find(PLAYER)->second.begin())->GetTransform(), (*iterBox)->GetTransform())) {
 			collision = true;
 			break;
 		}
@@ -845,7 +863,7 @@ bool ObjectManager::explosionRange(const int& _direction)
 //적 충돌
 bool ObjectManager::enemyCollision() {
 	bool collision = false;
-	//적들 플레이어 충돌
+	//Enemy Player Collision
 	for (int i = 0; i < 16; i++) {
 		if (m_pEnemy[i]->getActive() &&
 			CollisionManager::CollisionRact((*ObjectList.find(PLAYER)->second.begin())->GetTransform(), m_pEnemy[i]->GetTransform())) {
@@ -854,7 +872,7 @@ bool ObjectManager::enemyCollision() {
 			break;
 		}
 	}
-	//적들 벽 충돌
+	//Enemy Wall Collision
 	for (int j = 0; j < 16; j++) {
 		for (list<Object*>::iterator iterWall = ObjectList.find(WALL)->second.begin();
 			iterWall != ObjectList.find(WALL)->second.end(); ++iterWall) {
@@ -864,10 +882,11 @@ bool ObjectManager::enemyCollision() {
 			}
 		}
 	}
-	//적들 상자 충돌
+	//Enemy Box Collision
 	for (int j = 0; j < 16; j++) {
-		for (int i = 0; i < box_cnt; i++) {
-			if (m_pEnemy[j]->getActive() && CollisionManager::CollisionRact(m_pEnemy[j]->GetTransform(), m_pBox[i]->GetTransform())) {
+		for (list<Object*>::iterator iterBox = ObjectList.find(BOX)->second.begin();
+			iterBox != ObjectList.find(BOX)->second.end(); ++iterBox) {
+			if (m_pEnemy[j]->getActive() && CollisionManager::CollisionRact(m_pEnemy[j]->GetTransform(), (*iterBox)->GetTransform())) {
 				collision = true;
 				break;
 			}

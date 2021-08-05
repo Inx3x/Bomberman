@@ -12,14 +12,11 @@ private:
 	map<OBJECT, list<Object*>> ObjectList;
 
 	int stage_cnt;
-	int wall_cnt;
 
-	Object* m_pBox[64];
-	int box_cnt;
-
-	Object* m_pItem[32];
 	int item_cnt;
 	int item_hp[32];
+
+	//Object* m_pItem[32];
 
 	Object* m_pBomb[16];
 	int bomb_cnt;

@@ -18,6 +18,12 @@ struct StudentInfo
 	int Math;
 };
 
+enum SUBJECT {
+	KOR,
+	ENG,
+	MATH
+};
+
 bool KorComp(const StudentInfo& left, const StudentInfo& right)
 {
 	return left.Kor > right.Kor;
@@ -25,6 +31,7 @@ bool KorComp(const StudentInfo& left, const StudentInfo& right)
 
 list<StudentInfo> StudentList;
 
+map<SUBJECT, list<StudentInfo>> StudentMap;
 
 void LoadDate();
 
@@ -32,6 +39,9 @@ int main(void)
 {
 	LoadDate();
 
+	StudentMap.insert(make_pair(KOR, StudentList));
+	//과목별로 넣으란게 먼말이죠?ㅠ
+	
 	StudentList.sort(KorComp);
 
 	for (list<StudentInfo>::iterator iter = StudentList.begin();
@@ -42,7 +52,6 @@ int main(void)
 		cout << "영어 점수 : " << iter->Eng << endl;
 		cout << "수학 점수 : " << iter->Math << endl << endl;
 	}
-
 
 	return 0;
 }

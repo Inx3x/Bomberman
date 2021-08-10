@@ -83,7 +83,6 @@ void ObjectManager::Initialize()
 	//Item Object Initialize
 	for (int i = 0; i < 32; i++) {
 		AddObject(ObjectFactory<Item>::CreateObject());
-		m_pItem[i]->setActive(true);
 		item_hp[i] = 3;
 	}
 	item_cnt = 0;
@@ -408,11 +407,21 @@ void ObjectManager::createBox()
 //Item Create
 void ObjectManager::createItem(const Transform& _m_pBox_TransInfo)
 {
+	for (list<Object*>::iterator iterItem = ObjectList.find(ITEM)->second.begin();
+		iterItem != ObjectList.find(ITEM)->second.end(); iterItem++) {
+		if (!(*iterItem)->getActive()) {
+			(*iterItem)->SetPosition(_m_pBox_TransInfo.Position.x, _m_pBox_TransInfo.Position.y);
+			(*iterItem)->setActive(true);
+			(*iterItem)->setTime(GetTickCount64());
+			break;
+		}
+	}
+	/*
 	m_pItem[item_cnt]->SetPosition(_m_pBox_TransInfo.Position.x, _m_pBox_TransInfo.Position.y);
 	m_pItem[item_cnt]->setActive(true);
 	m_pItem[item_cnt]->setTime(GetTickCount64());
-
 	item_cnt++;
+	*/
 }
 
 //적 생성
@@ -649,16 +658,17 @@ void ObjectManager::explosionCollision()
 				m_pBomb[i]->setTime(m_pBomb[i]->gettTime() - 3000);
 		}
 	}
-	//폭파 아이템 충돌
-	for (int i = 0; i < 32; i++) {
+	//Explosion Item Collision
+	for (list<Object*>::iterator iterItem = ObjectList.find(ITEM)->second.begin();
+		iterItem != ObjectList.find(ITEM)->second.end(); iterItem++) {
 		for (int j = 0; j < 16; j++) {
 			for (int k = 0; k < 4; k++) {
-				if (m_pItem[i]->getActive() && m_pExplosion[j][k]->getActive() &&
-					CollisionManager::CollisionRact(m_pItem[i]->GetTransform(), m_pExplosion[j][k]->GetTransform())) {
+				if ((*iterItem)->getActive() && m_pExplosion[j][k]->getActive() &&
+					CollisionManager::CollisionRact((*iterItem)->GetTransform(), m_pExplosion[j][k]->GetTransform())) {
 					item_hp[i]--;
 					if (item_hp[i] < 0) {
-						m_pItem[i]->setActive(false);
-						m_pItem[i]->SetPosition(0, 0);
+						(*iterItem)->setActive(false);
+						(*iterItem)->SetPosition(0, 0);
 					}
 				}
 			}
@@ -724,13 +734,14 @@ bool ObjectManager::playerCollision()
 		CollisionManager::CollisionRact((*ObjectList.find(PLAYER)->second.begin())->GetTransform(), m_pBoss->GetTransform())) {
 		Player::PlayerHp = EMPTYHP;
 	}
-	//플레이어 아이템 충돌
-	for (int i = 0; i < 32; i++) {
-		if (m_pItem[i]->getActive() && !collision &&
-			CollisionManager::CollisionRact(m_pItem[i]->GetTransform(), (*ObjectList.find(PLAYER)->second.begin())->GetTransform())) {
-			m_pItem[i]->setActive(false);
-			m_pItem[i]->SetPosition(0, 0);
-			switch (m_pItem[i]->getItemList())
+	//Player Item Collision
+	for (list<Object*>::iterator iterItem = ObjectList.find(ITEM)->second.begin();
+		iterItem != ObjectList.find(ITEM)->second.end(); iterItem++) {
+		if ((*iterItem)->getActive() && !collision &&
+			CollisionManager::CollisionRact((*iterItem)->GetTransform(), (*ObjectList.find(PLAYER)->second.begin())->GetTransform())) {
+			(*iterItem)->setActive(false);
+			(*iterItem)->SetPosition(0, 0);
+			switch ((*iterItem)->getItemList())
 			{
 			case BOMBPOWERUP:
 				for (int i = 0; i < 4; i++) {
@@ -911,13 +922,14 @@ bool ObjectManager::enemyCollision() {
 			}
 		}
 	}
-	//적들 아이템 충돌
-	for (int i = 0; i < 32; i++) {
+	//Enemy Item Collision
+	for (list<Object*>::iterator iterItem = ObjectList.find(ITEM)->second.begin();
+		iterItem != ObjectList.find(ITEM)->second.end(); iterItem++) {
 		for (int j = 0; j < 16; j++) {
-			if (m_pItem[i]->getActive() && !collision &&
-				CollisionManager::CollisionRact(m_pItem[i]->GetTransform(), m_pEnemy[j]->GetTransform())) {
-				m_pItem[i]->setActive(false);
-				m_pItem[i]->SetPosition(0, 0);
+			if ((*iterItem)->getActive() && !collision &&
+				CollisionManager::CollisionRact((*iterItem)->GetTransform(), m_pEnemy[j]->GetTransform())) {
+				(*iterItem)->setActive(false);
+				(*iterItem)->SetPosition(0, 0);
 				break;
 			}
 		}
@@ -937,11 +949,12 @@ bool ObjectManager::bossCollision()
 	if (CollisionManager::CollisionRact((*ObjectList.find(PLAYER)->second.begin())->GetTransform(), m_pBoss->GetTransform())) {
 		Player::PlayerHp = EMPTYHP;
 	}
-	//보스 아이템 충돌
-	for (int i = 0; i < 32; i++) {
-		if (m_pItem[i]->getActive() && CollisionManager::CollisionRact(m_pItem[i]->GetTransform(), m_pBoss->GetTransform())) {
-			m_pItem[i]->setActive(false);
-			m_pItem[i]->SetPosition(0, 0);
+	//Boss Item Collision
+	for (list<Object*>::iterator iterItem = ObjectList.find(ITEM)->second.begin();
+		iterItem != ObjectList.find(ITEM)->second.end(); iterItem++) {
+		if ((*iterItem)->getActive() && CollisionManager::CollisionRact((*iterItem)->GetTransform(), m_pBoss->GetTransform())) {
+			(*iterItem)->setActive(false);
+			(*iterItem)->SetPosition(0, 0);
 		}
 	}
 

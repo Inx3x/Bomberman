@@ -38,8 +38,8 @@ public:
 		return m_pInstance;
 	}
 
-	void AddObject(Object* _obj);
-	bool ExceptionHandling(OBJECT _obj);
+	void AddObject(Object*);
+	bool ExceptionHandling(OBJECT);
 	void Initialize();
 	void Update();
 	void Render();

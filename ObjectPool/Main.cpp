@@ -2,96 +2,171 @@
 #include <Windows.h>
 #include <list>
 #include <map>
+#include <string>
 
 using namespace std;
 
-
-struct ObjectPool
+struct Vector3
 {
-	int Key;
-	int Value;
-	bool Active;
+	float x, y;
 
-	ObjectPool() : Key(0), Value(0), Active(false) { }
+	Vector3() {}
 
-	ObjectPool(int _Key, int _Value, bool _Active)
-		: Key(_Key), Value(_Value), Active(_Active) { }
+	Vector3(float _x, float _y) : x(_x), y(_y) {}
+};
+
+
+struct Transform
+{
+	Vector3 Position;
+	Vector3 Scale;
+};
+
+
+class Object
+{
+private:
+	string str;
+	Transform TransInfo;
+public:
+	void Initialize()
+	{
+		str = "->";
+		TransInfo.Position = Vector3(4.0f, 15.0f);
+	}
+
+	int Update()
+	{
+		TransInfo.Position.x++;
+
+		if (TransInfo.Position.x >= 100)
+			return 1;
+
+		return 0;
+	}
+
+	void Render()
+	{
+		COORD Pos = { (SHORT)TransInfo.Position.x, (SHORT)TransInfo.Position.y };
+		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), Pos);
+		cout << str << endl;
+	}
+public:
+	Object() { }
+	~Object() { }
 };
 
 
 bool check = false;
 int Count = 0;
 
+
+void Output(float _x, float _y, string _str);
+
+
+
+
 int main(void)
 {
-	list<ObjectPool*> ObjectPoolList;
+	//** 실제 사용한 오브젝트 (랜더링 될 오브젝트 리스트)
+	list<Object*> EnableList;
+
+	//** 사용을 마친 오브젝트 리스트 (랜더링 되지 않음)
+	list<Object*> DesableList;
+
 
 	while (true)
 	{
 		system("cls");
 
+		//** 총알이 발사될 위치.
+		Output(2, 15, "◎");
+
 		check = false;
 
+		//** 키 입력 이벤트 확인
 		if (GetAsyncKeyState(VK_RETURN))
+			//** 한번만 입력받기위함.
 			check = true;
 
 
+		//** 입력이 되었다면..
 		if (check)
 		{
-			if (ObjectPoolList.empty())
+			//** DesableList 에 여분의 오브젝트가 있는지 확인 하고 없다면...
+			if (DesableList.empty())
 			{
-				ObjectPoolList.push_back(
-					new ObjectPool(Count++, 0, false));
+				//** 5개의 오브젝트를 추가 생성한 후...
+				for (int i = 0; i < 5; ++i)
+					DesableList.push_back(new Object);
+			}
+
+			//** 추가 생성된 오브젝트 하나를 선택.
+			list<Object*>::iterator iter = DesableList.begin();
+
+
+			//** 초기화 에 필요한 구문 작성.
+			(*iter)->Initialize();
+
+			//** 사용할 리스트에 추가.
+			EnableList.push_back((*iter));
+
+			//** 현재 리스트에서 삭제.
+			DesableList.pop_front();
+		}
+
+
+		for (list<Object*>::iterator iter = EnableList.begin();
+			iter != EnableList.end();)
+		{
+			int iResult = (*iter)->Update();
+			(*iter)->Render();
+
+			if (iResult == 1)
+			{
+				//** 현재 리스트에서 삭제.
+				DesableList.push_back((*iter));
+
+				//** 사용할 리스트에 추가.
+				iter = EnableList.erase(iter);
 			}
 			else
-			{
-				for (list<ObjectPool*>::iterator iter = ObjectPoolList.begin(); iter != ObjectPoolList.end(); ++iter)
-				{
-					if (!(*iter)->Active)
-					{
-						(*iter)->Active = true;
-						(*iter)->Value = 0;
-						(*iter)->Key = 0;
-						break;
-					}
-				}
-			}
+				++iter;
 		}
 
-
-
-
-		for (list<ObjectPool*>::iterator iter = ObjectPoolList.begin();
-			iter != ObjectPoolList.end(); ++iter)
-		{
-			if ((*iter)->Active)
-			{
-				(*iter)->Value++;
-				cout << (*iter)->Key << " : "
-					<< (*iter)->Value << endl << endl;
-
-				if ((*iter)->Value >= 50)
-				{
-					(*iter)->Active = false;
-				}
-			}
-		}
+		string Buffer = "DesableList : " + to_string(DesableList.size());
+		Output(10, 1, Buffer);
 
 		Sleep(50);
 	}
 
 
 
-
-
-	for (list<ObjectPool*>::iterator iter = ObjectPoolList.begin();
-		iter != ObjectPoolList.end(); ++iter)
+	//** DesableList 전제 삭제
+	for (list<Object*>::iterator iter = DesableList.begin();
+		iter != DesableList.end(); ++iter)
 	{
 		delete (*iter);
 		(*iter) = NULL;
 	}
-	ObjectPoolList.clear();
+	DesableList.clear();
 
+
+	//** EnableList 전제 삭제
+	for (list<Object*>::iterator iter = EnableList.begin();
+		iter != EnableList.end(); ++iter)
+	{
+		delete (*iter);
+		(*iter) = NULL;
+	}
+	EnableList.clear();
 
 	return 0;
+}
+
+void Output(float _x, float _y, string _str)
+{
+	COORD Pos = { (SHORT)_x, (SHORT)_y };
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), Pos);
+	cout << _str << endl;
 }

@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Example_C++", "Example_C++\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ObjectPool", "ObjectPool\ObjectPool.vcxproj", "{D49FED38-D37F-44EA-8134-DA8058C9BA6C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ProtoType", "ProtoType\ProtoType.vcxproj", "{DDA20B86-9D2F-4D03-9728-4FA8D8E3FFFF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +43,14 @@ Global
 		{D49FED38-D37F-44EA-8134-DA8058C9BA6C}.Release|x64.Build.0 = Release|x64
 		{D49FED38-D37F-44EA-8134-DA8058C9BA6C}.Release|x86.ActiveCfg = Release|Win32
 		{D49FED38-D37F-44EA-8134-DA8058C9BA6C}.Release|x86.Build.0 = Release|Win32
+		{DDA20B86-9D2F-4D03-9728-4FA8D8E3FFFF}.Debug|x64.ActiveCfg = Debug|x64
+		{DDA20B86-9D2F-4D03-9728-4FA8D8E3FFFF}.Debug|x64.Build.0 = Debug|x64
+		{DDA20B86-9D2F-4D03-9728-4FA8D8E3FFFF}.Debug|x86.ActiveCfg = Debug|Win32
+		{DDA20B86-9D2F-4D03-9728-4FA8D8E3FFFF}.Debug|x86.Build.0 = Debug|Win32
+		{DDA20B86-9D2F-4D03-9728-4FA8D8E3FFFF}.Release|x64.ActiveCfg = Release|x64
+		{DDA20B86-9D2F-4D03-9728-4FA8D8E3FFFF}.Release|x64.Build.0 = Release|x64
+		{DDA20B86-9D2F-4D03-9728-4FA8D8E3FFFF}.Release|x86.ActiveCfg = Release|Win32
+		{DDA20B86-9D2F-4D03-9728-4FA8D8E3FFFF}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

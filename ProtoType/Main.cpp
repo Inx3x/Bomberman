@@ -23,15 +23,15 @@ void InitObject(string _key) {
 		pObjList[i]->SetIndex(i+1);
 	}
 	*/
+
 	for (int i = 0; i < 3; i++)
 	{
-		pObjList.push_back(pObj->Clone());
-	}
-	int count = 0;
-	for (list<Object*>::iterator iter = pObjList.begin(); iter != pObjList.end();iter++)
-	{
-		(*iter)->Initialize();
-		(*iter)->SetIndex(++count);
+		Object* pTempObj = pObj->Clone();
+
+		pTempObj->Initialize();
+		pTempObj->SetIndex(i);
+
+		pObjList.push_back(pTempObj);
 	}
 }
 int main() {
@@ -44,10 +44,11 @@ int main() {
 		if (pObjList[i])	pObjList[i]->Render(i);
 	}
 	*/
-	int count = 0;
+
 	for (list<Object*>::iterator iter = pObjList.begin(); iter != pObjList.end(); iter++)
 	{
-		if ((*iter))	(*iter)->Render(count++);
+		if ((*iter))	
+			(*iter)->Render();
 	}
 	/*
 	for (int i = 0; i < 3; i++)

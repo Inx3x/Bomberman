@@ -17,8 +17,8 @@ int Object::Update() {
 	return 0;
 }
 
-void Object::Render(int _n) {
-	COORD pos = { (SHORT)transinfo.position.x, (SHORT)transinfo.position.y + _n };
+void Object::Render() {
+	COORD pos = { (SHORT)transinfo.position.x, (SHORT)transinfo.position.y + transinfo.index };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 	cout << transinfo.index << " : " << str << endl;
 }

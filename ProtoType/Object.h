@@ -13,7 +13,7 @@ public:
 
 	void Initialize();
 	int Update();
-	void Render(int);
+	void Render();
 
 	Object* Clone() { return new Object(*this); }
 
